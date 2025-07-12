@@ -1,0 +1,14 @@
+Core Libraries
+aiohttp
+websockets
+numpy
+pandas
+pyyaml
+
+For Potential ML/RL Integration
+tensorflow
+torch
+scikit-learn
+For Linting and Formatting
+flake8
+black
