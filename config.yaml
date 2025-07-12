@@ -1,0 +1,91 @@
+# ==============================================================================
+# High-Frequency Trading Bot Configuration
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# Exchange Configuration
+# ------------------------------------------------------------------------------
+# Define the exchanges to connect to and their API credentials.
+# The 'connector' key should match the name of the connector module in src/connectors/
+exchanges:
+  binance_futures:
+    connector: "binance"
+    api_key: "YOUR_BINANCE_API_KEY"
+    api_secret: "YOUR_BINANCE_API_SECRET"
+    base_url: "https://fapi.binance.com" # Futures
+    ws_url: "wss://fstream.binance.com/ws"
+    is_testnet: true # Use testnet for development
+  
+  # Example for another exchange (requires creating a new connector)
+  # kraken:
+  #   connector: "kraken"
+  #   api_key: "YOUR_KRAKEN_API_KEY"
+  #   api_secret: "YOUR_KRAKEN_API_SECRET"
+
+# ------------------------------------------------------------------------------
+# Strategy Configuration
+# ------------------------------------------------------------------------------
+# Define the strategies to run and their parameters.
+# The 'strategy_name' should match a strategy class in src/strategies/
+strategies:
+  - strategy_name: "VWAPStrategy"
+    enabled: true
+    params:
+      exchange: "binance_futures"
+      symbol: "BTCUSDT"
+      vwap_period: 30 # in minutes
+      order_amount: 0.001 # in BTC
+      target_spread_pct: 0.001 # 0.1% from VWAP
+      start_time: "09:30" # UTC
+      end_time: "16:00" # UTC
+
+  - strategy_name: "MarketMakingStrategy"
+    enabled: false # This strategy is just an example
+    params:
+      exchange: "binance_futures"
+      symbol: "ETHUSDT"
+      spread: 0.0005 # 0.05%
+      order_size: 0.01 # in ETH
+      update_interval: 5 # in seconds
+
+# ------------------------------------------------------------------------------
+# Risk Management Configuration
+# ------------------------------------------------------------------------------
+risk_management:
+  max_open_positions: 10
+  max_position_size_usd: 10000
+  max_drawdown_pct: 5.0 # 5% max portfolio drawdown
+  kill_switch_enabled: true
+  
+  # Per-symbol limits
+  symbol_limits:
+    BTCUSDT:
+      max_position_size: 0.5 # in BTC
+    ETHUSDT:
+      max_position_size: 5 # in ETH
+
+# ------------------------------------------------------------------------------
+# Logging Configuration
+# ------------------------------------------------------------------------------
+logging:
+  version: 1
+  disable_existing_loggers: false
+  formatters:
+    standard:
+      format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  handlers:
+    console:
+      class: "logging.StreamHandler"
+      formatter: "standard"
+      level: "INFO"
+    file:
+      class: "logging.handlers.RotatingFileHandler"
+      formatter: "standard"
+      filename: "trading_bot.log"
+      maxBytes: 10485760 # 10MB
+      backupCount: 5
+      level: "DEBUG"
+  root:
+    handlers: ["console", "file"]
+    level: "DEBUG"
+
